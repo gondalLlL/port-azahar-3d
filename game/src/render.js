@@ -6,7 +6,7 @@ export class RenderManager {
     this.container = container;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb);
-    this.scene.fog = new THREE.FogExp2(0x87ceeb, 0.0015);
+    this.scene.fog = new THREE.FogExp2(0x87ceeb, 0.0008);
 
     this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.5, 3000);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -16,11 +16,11 @@ export class RenderManager {
     this.container.appendChild(this.renderer.domElement);
 
     // Lighting
-    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7);
+    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
     this.hemiLight.position.set(0, 500, 0);
     this.scene.add(this.hemiLight);
 
-    this.dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    this.dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
     this.dirLight.position.set(300, 600, 300);
     this.dirLight.castShadow = true;
     this.scene.add(this.dirLight);
@@ -48,7 +48,7 @@ export class RenderManager {
     this.scene.background.setHex(skyColor);
     this.scene.fog.color.setHex(skyColor);
 
-    this.dirLight.intensity = isNight ? 0.1 : Math.max(0.2, Math.sin(sunAngle));
+    this.dirLight.intensity = isNight ? 0.2 : Math.max(0.4, Math.sin(sunAngle) * 1.2);
   }
 
   renderMinimap(playerPos, trafficCars, policeCars, missionTarget) {

@@ -58,6 +58,29 @@ async function main() {
     await page.close();
   }
 
+  // Test plain game boot & new game start
+  {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    page.on('console', msg => {
+      if (msg.type() === 'error') summary.errors.push(`[plain console.error] ${msg.text()}`);
+    });
+    page.on('pageerror', err => {
+      summary.errors.push(`[plain pageerror] ${err.message}`);
+    });
+    const url = `http://localhost:8124/index.html`;
+    console.log(`Opening plain game ${url}...`);
+    try {
+      await page.goto(url, { waitUntil: 'networkidle', timeout: 10000 });
+      await new Promise(r => setTimeout(r, 1000));
+      await page.click('#start-btn');
+      await new Promise(r => setTimeout(r, 1000));
+      console.log('Plain game booted and started successfully.');
+    } catch (e) {
+      summary.errors.push(`[plain game] ${e.message}`);
+    }
+    await page.close();
+  }
+
   await browser.close();
   server.kill();
 

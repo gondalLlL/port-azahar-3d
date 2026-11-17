@@ -73,28 +73,58 @@ const trafficCars = [];
 const policeCars = [];
 const rng = new SeededRandom(123);
 
+const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.3, 8);
+wheelGeo.rotateZ(Math.PI / 2);
+const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+
 for (let i = 0; i < 15; i++) {
   const tcGroup = new THREE.Group();
-  const tm = new THREE.Mesh(new THREE.BoxGeometry(2, 0.9, 4), new THREE.MeshStandardMaterial({ color: rng.choice([0x95a5a6, 0xe67e22, 0x27ae60, 0xd35400]) }));
+  const bodyMat = new THREE.MeshStandardMaterial({ color: rng.choice([0x95a5a6, 0xe67e22, 0x27ae60, 0xd35400, 0x3498db, 0xe74c3c]), roughness: 0.3, metalness: 0.6 });
+  const tm = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.9, 4.2), bodyMat);
   tm.position.y = 0.5;
   tcGroup.add(tm);
+
+  const tcCabin = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 2.0), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1 }));
+  tcCabin.position.set(0, 1.2, -0.2);
+  tcGroup.add(tcCabin);
+
+  [[-1.0, 0.35, 1.4], [1.0, 0.35, 1.4], [-1.0, 0.35, -1.4], [1.0, 0.35, -1.4]].forEach(pos => {
+    const w = new THREE.Mesh(wheelGeo, wheelMat);
+    w.position.set(...pos);
+    tcGroup.add(w);
+  });
+
   tcGroup.position.set(rng.range(-500, 500), 0, rng.range(-500, 500));
   renderMgr.scene.add(tcGroup);
   trafficCars.push({ group: tcGroup, x: tcGroup.position.x, z: tcGroup.position.z, speed: rng.range(5, 15), dir: rng.choice([0, Math.PI/2, Math.PI, Math.PI*1.5]) });
 }
 
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 6; i++) {
   const pcGroup = new THREE.Group();
-  const pm = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.0, 4.4), new THREE.MeshStandardMaterial({ color: 0xfbd2d2 }));
+  const pm = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.0, 4.4), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3, metalness: 0.5 }));
   pm.position.y = 0.5;
   pcGroup.add(pm);
-  // lightbar
-  const lb = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.2, 0.4), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-  lb.position.set(0, 1.2, 0);
-  pcGroup.add(lb);
+
+  const doorMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+  const doorL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 2.0), doorMat);
+  doorL.position.set(-1.12, 0.5, 0);
+  pcGroup.add(doorL);
+  const doorR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 2.0), doorMat);
+  doorR.position.set(1.12, 0.5, 0);
+  pcGroup.add(doorR);
+
+  const lbMatRed = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const lbMatBlue = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+  const lbRed = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.2, 0.4), lbMatRed);
+  lbRed.position.set(-0.3, 1.2, 0);
+  pcGroup.add(lbRed);
+  const lbBlue = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.2, 0.4), lbMatBlue);
+  lbBlue.position.set(0.3, 1.2, 0);
+  pcGroup.add(lbBlue);
+
   pcGroup.position.set(rng.range(-300, 300), 0, rng.range(-300, 300));
   renderMgr.scene.add(pcGroup);
-  policeCars.push({ group: pcGroup, x: pcGroup.position.x, z: pcGroup.position.z, speed: 18 });
+  policeCars.push({ group: pcGroup, x: pcGroup.position.x, z: pcGroup.position.z, speed: 18, lbRed, lbBlue });
 }
 
 // Mission Marker Cylinder
@@ -105,7 +135,7 @@ missionMarker.position.set(0, 10, 0);
 renderMgr.scene.add(missionMarker);
 
 // Initialize shot staging
-initShotStaging(gameState);
+initShotStaging(gameState, renderMgr, carGroup, playerGroup, trafficCars, policeCars, missionMarker, startMission);
 
 // UI Event Handlers
 document.getElementById('start-btn').addEventListener('click', () => {
@@ -225,6 +255,18 @@ function loop(now) {
 
   // Render
   renderMgr.updateLighting(gameState.timeOfDay);
+  let isNight = gameState.timeOfDay < 6 || gameState.timeOfDay > 19;
+  if (world.buildingMat) {
+    world.buildingMat.emissiveIntensity = isNight ? 0.8 : 0.0;
+  }
+  const flash = Math.floor(now * 0.01) % 2 === 0;
+  policeCars.forEach(pc => {
+    if (pc.lbRed && pc.lbBlue) {
+      pc.lbRed.material.color.setHex(flash ? 0xff0000 : 0x0000ff);
+      pc.lbBlue.material.color.setHex(flash ? 0x0000ff : 0xff0000);
+    }
+  });
+
   renderMgr.renderer.render(renderMgr.scene, renderMgr.camera);
 
   if (gameState.state === 'PLAYING' || gameState.shotMode) {

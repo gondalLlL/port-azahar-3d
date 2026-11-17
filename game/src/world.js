@@ -12,9 +12,9 @@ export function createCityWorld(scene, seed = 1) {
   const ctx = canvas.getContext('2d');
 
   // Background / base asphalt
-  ctx.fillStyle = '#1c222d';
+  ctx.fillStyle = '#e5be9e';
   ctx.fillRect(0, 2048 - 400, 2048, 400); // south beach sand
-  ctx.fillStyle = '#222831';
+  ctx.fillStyle = '#2b3440';
   ctx.fillRect(0, 0, 2048, 2048);
 
   const scale = 2048 / CONFIG.WORLD_SIZE;
@@ -32,13 +32,13 @@ export function createCityWorld(scene, seed = 1) {
     const p1 = worldToCanvas(d.bounds.xMin, d.bounds.zMin);
     const p2 = worldToCanvas(d.bounds.xMax, d.bounds.zMax);
     ctx.fillStyle = '#' + d.color.toString(16).padStart(6, '0');
-    ctx.globalAlpha = 0.15;
+    ctx.globalAlpha = 0.25;
     ctx.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
     ctx.globalAlpha = 1.0;
   });
 
   // Draw Roads grid
-  ctx.strokeStyle = '#34495e';
+  ctx.strokeStyle = '#415b76';
   ctx.lineWidth = CONFIG.ROAD_WIDTH * scale;
   ctx.lineCap = 'round';
 
@@ -53,14 +53,14 @@ export function createCityWorld(scene, seed = 1) {
 
     // Road markings (center yellow dashed)
     ctx.strokeStyle = '#f1c40f';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([10, 10]);
+    ctx.lineWidth = 3;
+    ctx.setLineDash([12, 12]);
     ctx.beginPath();
     ctx.moveTo(p1.x, p1.y);
     ctx.lineTo(p2.x, p2.y);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.strokeStyle = '#34495e';
+    ctx.strokeStyle = '#415b76';
     ctx.lineWidth = CONFIG.ROAD_WIDTH * scale;
   }
 
@@ -73,19 +73,19 @@ export function createCityWorld(scene, seed = 1) {
     ctx.stroke();
 
     ctx.strokeStyle = '#f1c40f';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([10, 10]);
+    ctx.lineWidth = 3;
+    ctx.setLineDash([12, 12]);
     ctx.beginPath();
     ctx.moveTo(p1.x, p1.y);
     ctx.lineTo(p2.x, p2.y);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.strokeStyle = '#34495e';
+    ctx.strokeStyle = '#415b76';
     ctx.lineWidth = CONFIG.ROAD_WIDTH * scale;
   }
 
   // South beach strip & ocean marker
-  ctx.fillStyle = '#e5be9e';
+  ctx.fillStyle = '#f3cfb0';
   ctx.fillRect(0, 2048 - 150, 2048, 150);
 
   const groundTexture = new THREE.CanvasTexture(canvas);
@@ -129,10 +129,10 @@ export function createCityWorld(scene, seed = 1) {
   facadeCanvas.width = 256;
   facadeCanvas.height = 256;
   const fCtx = facadeCanvas.getContext('2d');
-  fCtx.fillStyle = '#34495e';
+  fCtx.fillStyle = '#4a6572';
   fCtx.fillRect(0, 0, 256, 256);
-  // draw grid of windows
-  fCtx.fillStyle = '#7f8c8d';
+  // draw grid of windows with strong contrast (pale reflective blue-grey)
+  fCtx.fillStyle = '#b2bec3';
   for (let wx = 20; wx < 236; wx += 35) {
     for (let wy = 20; wy < 236; wy += 45) {
       fCtx.fillRect(wx, wy, 20, 30);
@@ -147,10 +147,10 @@ export function createCityWorld(scene, seed = 1) {
   const nCtx = nightCanvas.getContext('2d');
   nCtx.fillStyle = '#000000';
   nCtx.fillRect(0, 0, 256, 256);
-  nCtx.fillStyle = '#f1c40f';
+  nCtx.fillStyle = '#fffa65';
   for (let wx = 20; wx < 236; wx += 35) {
     for (let wy = 20; wy < 236; wy += 45) {
-      if (rng.next() > 0.3) {
+      if (rng.next() > 0.25) {
         nCtx.fillRect(wx, wy, 20, 30);
       }
     }
@@ -162,7 +162,7 @@ export function createCityWorld(scene, seed = 1) {
     emissiveMap: nightTexture,
     emissive: new THREE.Color(0xffffff),
     emissiveIntensity: 0.0,
-    roughness: 0.7
+    roughness: 0.5
   });
 
   const boxGeo = new THREE.BoxGeometry(1, 1, 1);
@@ -206,5 +206,5 @@ export function createCityWorld(scene, seed = 1) {
   }
   scene.add(neonGroup);
 
-  return { groundMesh, waterMesh, instancedBuildings, neonGroup, buildingInfos };
+  return { groundMesh, waterMesh, instancedBuildings, neonGroup, buildingInfos, buildingMat };
 }
