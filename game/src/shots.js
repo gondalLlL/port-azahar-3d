@@ -32,33 +32,52 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         gameState.state = 'PLAYING';
         gameState.inVehicle = true;
         gameState.timeOfDay = 13; // bright day
-        const cx = 50, cz = 50;
-        gameState.vehicle.x = cx;
+        const cx = 22;
+        const cz = 50;
+        gameState.vehicle.x = cx + 3.5;
         gameState.vehicle.z = cz;
-        gameState.vehicle.rot = Math.PI / 4;
-        gameState.vehicle.speed = 20;
-        carGroup.position.set(cx, 0, cz);
+        gameState.vehicle.rot = 0;
+        gameState.vehicle.speed = 15;
+        carGroup.position.set(gameState.vehicle.x, 0, gameState.vehicle.z);
         carGroup.rotation.y = gameState.vehicle.rot;
         playerGroup.visible = false;
         carGroup.visible = true;
 
-        renderMgr.camera.position.set(
-          cx - Math.sin(gameState.vehicle.rot) * 9,
-          3.5,
-          cz - Math.cos(gameState.vehicle.rot) * 9
-        );
-        renderMgr.camera.lookAt(cx, 1, cz);
+        renderMgr.camera.position.set(gameState.vehicle.x, 2.5, cz - 8);
+        renderMgr.camera.lookAt(gameState.vehicle.x, 1, cz + 25);
 
-        for (let i = 0; i < 8; i++) {
-          const angle = (i / 8) * Math.PI * 2;
-          const dist = 15 + (i * 3);
-          const tx = cx + Math.cos(angle) * dist;
-          const tz = cz + Math.sin(angle) * dist;
-          if (trafficCars[i]) {
-            trafficCars[i].x = tx;
-            trafficCars[i].z = tz;
-            trafficCars[i].group.position.set(tx, 0, tz);
-          }
+        if (trafficCars[0]) {
+          trafficCars[0].x = cx + 3.5;
+          trafficCars[0].z = cz + 16;
+          trafficCars[0].group.position.set(trafficCars[0].x, 0, trafficCars[0].z);
+          trafficCars[0].group.rotation.y = 0;
+          trafficCars[0].group.visible = true;
+        }
+        if (trafficCars[1]) {
+          trafficCars[1].x = cx + 3.5;
+          trafficCars[1].z = cz + 30;
+          trafficCars[1].group.position.set(trafficCars[1].x, 0, trafficCars[1].z);
+          trafficCars[1].group.rotation.y = 0;
+          trafficCars[1].group.visible = true;
+        }
+        if (trafficCars[2]) {
+          trafficCars[2].x = cx - 3.5;
+          trafficCars[2].z = cz + 22;
+          trafficCars[2].group.position.set(trafficCars[2].x, 0, trafficCars[2].z);
+          trafficCars[2].group.rotation.y = Math.PI;
+          trafficCars[2].group.visible = true;
+        }
+        if (trafficCars[3]) {
+          trafficCars[3].x = cx - 7;
+          trafficCars[3].z = cz + 5;
+          trafficCars[3].group.position.set(trafficCars[3].x, 0, trafficCars[3].z);
+          trafficCars[3].group.visible = true;
+        }
+        if (trafficCars[4]) {
+          trafficCars[4].x = cx + 7;
+          trafficCars[4].z = cz - 5;
+          trafficCars[4].group.position.set(trafficCars[4].x, 0, trafficCars[4].z);
+          trafficCars[4].group.visible = true;
         }
 
         gameState.currentMissionIndex = 0;
@@ -69,7 +88,8 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         gameState.inVehicle = true;
         gameState.wantedLevel = 3;
         gameState.timeOfDay = 16;
-        const cx = 100, cz = 100;
+        const cx = 96;
+        const cz = 100;
         gameState.vehicle.x = cx;
         gameState.vehicle.z = cz;
         gameState.vehicle.rot = 0;
@@ -79,38 +99,64 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         playerGroup.visible = false;
         carGroup.visible = true;
 
-        renderMgr.camera.position.set(cx, 4, cz - 10);
-        renderMgr.camera.lookAt(cx, 1, cz + 5);
+        renderMgr.camera.position.set(cx, 4.5, cz - 10.5);
+        renderMgr.camera.lookAt(cx, 1, cz + 15);
 
-        for (let i = 0; i < 4; i++) {
-          const px = cx + (i === 0 ? -4 : (i === 1 ? 4 : (i === 2 ? -6 : 6)));
-          const pz = cz - (6 + i * 2);
-          if (policeCars[i]) {
-            policeCars[i].x = px;
-            policeCars[i].z = pz;
-            policeCars[i].group.position.set(px, 0, pz);
-          }
+        if (policeCars[0]) {
+          policeCars[0].x = cx - 3.5;
+          policeCars[0].z = cz - 6;
+          policeCars[0].group.position.set(policeCars[0].x, 0, policeCars[0].z);
+          policeCars[0].group.visible = true;
         }
+        if (policeCars[1]) {
+          policeCars[1].x = cx + 3.5;
+          policeCars[1].z = cz - 6;
+          policeCars[1].group.position.set(policeCars[1].x, 0, policeCars[1].z);
+          policeCars[1].group.visible = true;
+        }
+        if (policeCars[2]) {
+          policeCars[2].x = cx;
+          policeCars[2].z = cz - 12;
+          policeCars[2].group.position.set(policeCars[2].x, 0, policeCars[2].z);
+          policeCars[2].group.visible = true;
+        }
+
+        gameState.currentMissionIndex = 2;
+        if (startMissionCallback) startMissionCallback(2);
 
       } else if (shot === 'night') {
         gameState.state = 'PLAYING';
         gameState.inVehicle = false;
         gameState.timeOfDay = 23;
-        const px = -20, pz = -20;
+        const px = 22;
+        const pz = 0;
         gameState.player.x = px;
         gameState.player.z = pz;
-        gameState.player.rot = Math.PI / 6;
+        gameState.player.rot = 0;
         playerGroup.position.set(px, 0, pz);
         playerGroup.rotation.y = gameState.player.rot;
         playerGroup.visible = true;
         carGroup.visible = false;
 
-        renderMgr.camera.position.set(px - Math.sin(gameState.player.rot) * 5, 2.0, pz - Math.cos(gameState.player.rot) * 5);
-        renderMgr.camera.lookAt(px + Math.sin(gameState.player.rot) * 10, 1.5, pz + Math.cos(gameState.player.rot) * 10);
+        renderMgr.camera.position.set(px, 2.5, pz - 8);
+        renderMgr.camera.lookAt(px, 1.5, pz + 20);
+
+        if (trafficCars[0]) {
+          trafficCars[0].x = px - 7;
+          trafficCars[0].z = pz + 4;
+          trafficCars[0].group.position.set(trafficCars[0].x, 0, trafficCars[0].z);
+          trafficCars[0].group.visible = true;
+        }
+        if (trafficCars[1]) {
+          trafficCars[1].x = px + 7;
+          trafficCars[1].z = pz - 4;
+          trafficCars[1].group.position.set(trafficCars[1].x, 0, trafficCars[1].z);
+          trafficCars[1].group.visible = true;
+        }
 
         if (missionMarker) {
-          missionMarker.position.set(px + 20, 10, pz + 30);
-          gameState.missionTarget = { x: px + 20, z: pz + 30 };
+          missionMarker.position.set(px, 10, pz + 35);
+          gameState.missionTarget = { x: px, z: pz + 35 };
         }
       }
     }
