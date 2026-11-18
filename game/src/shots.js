@@ -46,37 +46,41 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         renderMgr.camera.position.set(gameState.vehicle.x, 2.5, cz - 8);
         renderMgr.camera.lookAt(gameState.vehicle.x, 1, cz + 25);
 
+        // 3 traffic cars ahead IN FRAME: same lane +18 m, oncoming lane +30 m (rotated to face player), same lane +45 m
         if (trafficCars[0]) {
           trafficCars[0].x = cx + 3.5;
-          trafficCars[0].z = cz + 16;
+          trafficCars[0].z = cz + 18;
           trafficCars[0].group.position.set(trafficCars[0].x, 0, trafficCars[0].z);
           trafficCars[0].group.rotation.y = 0;
           trafficCars[0].group.visible = true;
         }
         if (trafficCars[1]) {
-          trafficCars[1].x = cx + 3.5;
+          trafficCars[1].x = cx - 3.5;
           trafficCars[1].z = cz + 30;
           trafficCars[1].group.position.set(trafficCars[1].x, 0, trafficCars[1].z);
-          trafficCars[1].group.rotation.y = 0;
+          trafficCars[1].group.rotation.y = Math.PI;
           trafficCars[1].group.visible = true;
         }
         if (trafficCars[2]) {
-          trafficCars[2].x = cx - 3.5;
-          trafficCars[2].z = cz + 22;
+          trafficCars[2].x = cx + 3.5;
+          trafficCars[2].z = cz + 45;
           trafficCars[2].group.position.set(trafficCars[2].x, 0, trafficCars[2].z);
-          trafficCars[2].group.rotation.y = Math.PI;
+          trafficCars[2].group.rotation.y = 0;
           trafficCars[2].group.visible = true;
         }
+        // 2 parked cars at curbs (±6 m lateral, +5 m and +22 m)
         if (trafficCars[3]) {
-          trafficCars[3].x = cx - 7;
+          trafficCars[3].x = cx + 3.5 + 6;
           trafficCars[3].z = cz + 5;
           trafficCars[3].group.position.set(trafficCars[3].x, 0, trafficCars[3].z);
+          trafficCars[3].group.rotation.y = Math.PI / 2;
           trafficCars[3].group.visible = true;
         }
         if (trafficCars[4]) {
-          trafficCars[4].x = cx + 7;
-          trafficCars[4].z = cz - 5;
+          trafficCars[4].x = cx + 3.5 - 6;
+          trafficCars[4].z = cz + 22;
           trafficCars[4].group.position.set(trafficCars[4].x, 0, trafficCars[4].z);
+          trafficCars[4].group.rotation.y = -Math.PI / 2;
           trafficCars[4].group.visible = true;
         }
 
@@ -102,22 +106,26 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         renderMgr.camera.position.set(cx, 4.5, cz - 10.5);
         renderMgr.camera.lookAt(cx, 1, cz + 15);
 
+        // 3 police cars flanking: (±3.5 m lateral, -6 m behind) and one centered -13 m behind player car
         if (policeCars[0]) {
           policeCars[0].x = cx - 3.5;
           policeCars[0].z = cz - 6;
           policeCars[0].group.position.set(policeCars[0].x, 0, policeCars[0].z);
+          policeCars[0].group.rotation.y = 0;
           policeCars[0].group.visible = true;
         }
         if (policeCars[1]) {
           policeCars[1].x = cx + 3.5;
           policeCars[1].z = cz - 6;
           policeCars[1].group.position.set(policeCars[1].x, 0, policeCars[1].z);
+          policeCars[1].group.rotation.y = 0;
           policeCars[1].group.visible = true;
         }
         if (policeCars[2]) {
           policeCars[2].x = cx;
-          policeCars[2].z = cz - 12;
+          policeCars[2].z = cz - 13;
           policeCars[2].group.position.set(policeCars[2].x, 0, policeCars[2].z);
+          policeCars[2].group.rotation.y = 0;
           policeCars[2].group.visible = true;
         }
 
@@ -135,7 +143,7 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         gameState.player.rot = 0;
         playerGroup.position.set(px, 0, pz);
         playerGroup.rotation.y = gameState.player.rot;
-        playerGroup.visible = true;
+        playerGroup.visible = false; // Hide on-foot player in night shot to remove bottom-center glow blob
         carGroup.visible = false;
 
         renderMgr.camera.position.set(px, 2.5, pz - 8);
@@ -158,6 +166,9 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
           missionMarker.position.set(px, 10, pz + 35);
           gameState.missionTarget = { x: px, z: pz + 35 };
         }
+
+        gameState.currentMissionIndex = 0;
+        if (startMissionCallback) startMissionCallback(0);
       }
     }
 

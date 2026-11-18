@@ -23,6 +23,7 @@ async function main() {
   for (const s of shots) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
     page.on('console', msg => {
+      console.log(`[browser console ${msg.type()}] ${msg.text()}`);
       if (msg.type() === 'error') summary.errors.push(`[console.error] ${msg.text()}`);
     });
     page.on('pageerror', err => {

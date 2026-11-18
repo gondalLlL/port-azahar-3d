@@ -395,31 +395,35 @@ function update(dt) {
   }
 
   // Traffic AI update
-  trafficCars.forEach(tc => {
-    tc.x += Math.sin(tc.dir) * tc.speed * dt;
-    tc.z += Math.cos(tc.dir) * tc.speed * dt;
-    if (Math.abs(tc.x) > 580 || Math.abs(tc.z) > 580) tc.dir += Math.PI;
-    tc.group.position.set(tc.x, 0, tc.z);
-  });
+  if (!gameState.shotMode) {
+    trafficCars.forEach(tc => {
+      tc.x += Math.sin(tc.dir) * tc.speed * dt;
+      tc.z += Math.cos(tc.dir) * tc.speed * dt;
+      if (Math.abs(tc.x) > 580 || Math.abs(tc.z) > 580) tc.dir += Math.PI;
+      tc.group.position.set(tc.x, 0, tc.z);
+    });
+  }
 
   // Police AI pursuit if wanted
-  policeCars.forEach(pc => {
-    if (gameState.wantedLevel > 0) {
-      const pPos = gameState.inVehicle ? gameState.vehicle : gameState.player;
-      const dx = pPos.x - pc.x;
-      const dz = pPos.z - pc.z;
-      const angle = Math.atan2(dx, dz);
-      pc.x += Math.sin(angle) * pc.speed * dt;
-      pc.z += Math.cos(angle) * pc.speed * dt;
-      pc.group.position.set(pc.x, 0, pc.z);
+  if (!gameState.shotMode) {
+    policeCars.forEach(pc => {
+      if (gameState.wantedLevel > 0) {
+        const pPos = gameState.inVehicle ? gameState.vehicle : gameState.player;
+        const dx = pPos.x - pc.x;
+        const dz = pPos.z - pc.z;
+        const angle = Math.atan2(dx, dz);
+        pc.x += Math.sin(angle) * pc.speed * dt;
+        pc.z += Math.cos(angle) * pc.speed * dt;
+        pc.group.position.set(pc.x, 0, pc.z);
 
-      // Check distance to player -> Busted or damage
-      const dist = Math.hypot(dx, dz);
-      if (dist < 4) {
-        triggerGameOver('BUSTED BY POLICE');
+        // Check distance to player -> Busted or damage
+        const dist = Math.hypot(dx, dz);
+        if (dist < 4) {
+          triggerGameOver('BUSTED BY POLICE');
+        }
       }
-    }
-  });
+    });
+  }
 
   // Mission target check
   if (gameState.missionTarget) {
