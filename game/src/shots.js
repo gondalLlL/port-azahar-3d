@@ -97,7 +97,7 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         gameState.vehicle.x = cx;
         gameState.vehicle.z = cz;
         gameState.vehicle.rot = 0;
-        gameState.vehicle.speed = 25;
+        gameState.vehicle.speed = 12; // ~43 MPH
         carGroup.position.set(cx, 0, cz);
         carGroup.rotation.y = 0;
         playerGroup.visible = false;
@@ -106,24 +106,27 @@ export function initShotStaging(gameState, renderMgr, carGroup, playerGroup, tra
         renderMgr.camera.position.set(cx, 4.5, cz - 10.5);
         renderMgr.camera.lookAt(cx, 1, cz + 15);
 
-        // 3 police cars flanking: (±3.5 m lateral, -6 m behind) and one centered -13 m behind player car
+        // 3 police cars:
+        // police 1: 3.4 m left, 1 m behind rear bumper (cz - 2.25 - 1 = cz - 3.25)
         if (policeCars[0]) {
-          policeCars[0].x = cx - 3.5;
-          policeCars[0].z = cz - 6;
+          policeCars[0].x = cx - 3.4;
+          policeCars[0].z = cz - 3.25;
           policeCars[0].group.position.set(policeCars[0].x, 0, policeCars[0].z);
           policeCars[0].group.rotation.y = 0;
           policeCars[0].group.visible = true;
         }
+        // police 2: 3.4 m right, 1 m behind rear bumper
         if (policeCars[1]) {
-          policeCars[1].x = cx + 3.5;
-          policeCars[1].z = cz - 6;
+          policeCars[1].x = cx + 3.4;
+          policeCars[1].z = cz - 3.25;
           policeCars[1].group.position.set(policeCars[1].x, 0, policeCars[1].z);
           policeCars[1].group.rotation.y = 0;
           policeCars[1].group.visible = true;
         }
+        // police 3: centered in lane, 7 m behind player car
         if (policeCars[2]) {
           policeCars[2].x = cx;
-          policeCars[2].z = cz - 13;
+          policeCars[2].z = cz - 7;
           policeCars[2].group.position.set(policeCars[2].x, 0, policeCars[2].z);
           policeCars[2].group.rotation.y = 0;
           policeCars[2].group.visible = true;
