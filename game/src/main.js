@@ -313,24 +313,28 @@ function update(dt) {
   if (gameState.inVehicle) {
     document.getElementById('speedo-panel').classList.remove('hidden');
     // Car Physics
-    if (input.isDown('KeyW') || input.isDown('ArrowUp')) {
-      gameState.vehicle.speed = Math.min(gameState.vehicle.speed + 15 * dt, 45);
-      audio.playEngine(gameState.vehicle.speed / 45);
-    } else if (input.isDown('KeyS') || input.isDown('ArrowDown')) {
-      gameState.vehicle.speed = Math.max(gameState.vehicle.speed - 20 * dt, -15);
-    } else {
-      gameState.vehicle.speed *= 0.98; // friction
+    if (!gameState.shotMode) {
+      if (input.isDown('KeyW') || input.isDown('ArrowUp')) {
+        gameState.vehicle.speed = Math.min(gameState.vehicle.speed + 15 * dt, 45);
+        audio.playEngine(gameState.vehicle.speed / 45);
+      } else if (input.isDown('KeyS') || input.isDown('ArrowDown')) {
+        gameState.vehicle.speed = Math.max(gameState.vehicle.speed - 20 * dt, -15);
+      } else {
+        gameState.vehicle.speed *= 0.98; // friction
+      }
+
+      if (input.isDown('KeyA') || input.isDown('ArrowLeft')) {
+        gameState.vehicle.rot += rotSpeed * (gameState.vehicle.speed / 20);
+      }
+      if (input.isDown('KeyD') || input.isDown('ArrowRight')) {
+        gameState.vehicle.rot -= rotSpeed * (gameState.vehicle.speed / 20);
+      }
     }
 
-    if (input.isDown('KeyA') || input.isDown('ArrowLeft')) {
-      gameState.vehicle.rot += rotSpeed * (gameState.vehicle.speed / 20);
+    if (!gameState.shotMode) {
+      gameState.vehicle.x += Math.sin(gameState.vehicle.rot) * gameState.vehicle.speed * dt;
+      gameState.vehicle.z += Math.cos(gameState.vehicle.rot) * gameState.vehicle.speed * dt;
     }
-    if (input.isDown('KeyD') || input.isDown('ArrowRight')) {
-      gameState.vehicle.rot -= rotSpeed * (gameState.vehicle.speed / 20);
-    }
-
-    gameState.vehicle.x += Math.sin(gameState.vehicle.rot) * gameState.vehicle.speed * dt;
-    gameState.vehicle.z += Math.cos(gameState.vehicle.rot) * gameState.vehicle.speed * dt;
 
     carGroup.position.set(gameState.vehicle.x, 0, gameState.vehicle.z);
     carGroup.rotation.y = gameState.vehicle.rot;
@@ -354,19 +358,21 @@ function update(dt) {
     document.getElementById('speedo-panel').classList.add('hidden');
     // On foot movement
     let spd = moveSpeed * (input.isDown('ShiftLeft') ? 1.8 : 1.0);
-    if (input.isDown('KeyW') || input.isDown('ArrowUp')) {
-      gameState.player.x += Math.sin(gameState.player.rot) * spd;
-      gameState.player.z += Math.cos(gameState.player.rot) * spd;
-    }
-    if (input.isDown('KeyS') || input.isDown('ArrowDown')) {
-      gameState.player.x -= Math.sin(gameState.player.rot) * spd * 0.6;
-      gameState.player.z -= Math.cos(gameState.player.rot) * spd * 0.6;
-    }
-    if (input.isDown('KeyA') || input.isDown('ArrowLeft')) {
-      gameState.player.rot += rotSpeed * 1.5;
-    }
-    if (input.isDown('KeyD') || input.isDown('ArrowRight')) {
-      gameState.player.rot -= rotSpeed * 1.5;
+    if (!gameState.shotMode) {
+      if (input.isDown('KeyW') || input.isDown('ArrowUp')) {
+        gameState.player.x += Math.sin(gameState.player.rot) * spd;
+        gameState.player.z += Math.cos(gameState.player.rot) * spd;
+      }
+      if (input.isDown('KeyS') || input.isDown('ArrowDown')) {
+        gameState.player.x -= Math.sin(gameState.player.rot) * spd * 0.6;
+        gameState.player.z -= Math.cos(gameState.player.rot) * spd * 0.6;
+      }
+      if (input.isDown('KeyA') || input.isDown('ArrowLeft')) {
+        gameState.player.rot += rotSpeed * 1.5;
+      }
+      if (input.isDown('KeyD') || input.isDown('ArrowRight')) {
+        gameState.player.rot -= rotSpeed * 1.5;
+      }
     }
 
     playerGroup.position.set(gameState.player.x, 0, gameState.player.z);
